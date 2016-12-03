@@ -28,9 +28,7 @@ sentence = ''
 token = []
 
 for row in file:
-	count = count + 1
-	if count > 1000:
-		break
+
 	try:
 		tokens = nltk.word_tokenize(row)
 		token.extend(tokens)
