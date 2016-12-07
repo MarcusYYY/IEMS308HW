@@ -7,8 +7,9 @@ from sklearn import svm,cross_validation,metrics
 from sklearn.neural_network import MLPClassifier
 from sklearn import tree
 
-def test_questions():
-	sentence = 'Who is the CEO of FaceBook?'
+
+def test_questions(question):
+	sentence = question
 	token = nltk.word_tokenize(sentence)
 	pos_tags = nltk.pos_tag(token)
 	sub = []
@@ -40,11 +41,11 @@ def test_questions():
 	X = experiment
 
 	result = clf.predict(X)
-	print sentence
-	print '-------------------final_result-----------------------'
+	
 	for key,val in dic_label.iteritems():
 		if val == result:
-			print key
+			return key
+	return 'No_question_type'
 #create question training set
 path = 'train_5500.label.txt'
 file = open(path)
@@ -99,9 +100,6 @@ for row in file:
 		sub.append(dic_label[label])
 	else:
 		sub.append(6)
-
-
-
 	final_train.append(sub)
 
 final_train = np.asarray(final_train)
@@ -118,13 +116,12 @@ X = final_train[:,0:4]
 y = final_train[:,4]
 clf.fit(X,y)
 result = clf.predict(X)
-print 'accruacy'
-print metrics.accuracy_score(y,result)
-print 'report'
-print metrics.classification_report(result,y)
-test_questions()
 
-
+# print 'accruacy'
+# print metrics.accuracy_score(y,result)
+# print 'report'
+# print metrics.classification_report(result,y)
+# test_questions()
 # clf_ = MLPClassifier(solver='lbfgs', alpha=1e-5,hidden_layer_sizes=(10,10), random_state=1)
 # clf_.fit(X, y)
 # result = clf_.predict(X)
