@@ -9,7 +9,7 @@ import math as m
 from fractions import Fraction
 import re 
 
-Document_set = Qg.Document_subset(Qg.ans,10)
+Document_set = Qg.Document_subset(Qg.ans,20)
 stop = set(stopwords.words('english'))
 
 def Rule_Based_AnswerSystem(Question):
@@ -75,6 +75,8 @@ def bigrams(sentence):
 
 def Answer_Score_System(Ans_set,question_):
 	question = nltk.word_tokenize(question_)
+	pattern = r'[^A-Za-z0-9\s]+'
+	question = re.sub(pattern,'',question_)
 	question_bigram = list(nltk.bigrams(question))
 	Number_of_Same_word = 0 
 	total_score = {}
@@ -93,20 +95,21 @@ def Answer_Score_System(Ans_set,question_):
 			for word in sentence:
 				if word == item:
 					score = score + 1
+		score = Fraction(score,len(sentence))
 		total_score[label] = score
-	# answer = max(total_score.iteritems(), key = operator.itemgetter(1))[0]
-	answer = total_score
+	answer = sorted(total_score.iteritems(), key = operator.itemgetter(1),reverse = True)
+	# answer = total_score
 	return answer
 
 def TF_IDF(Ans_set,question_):
 	total_Num = len(Qg.All_relevant_Document)
 	question_term = Qg.Question_term(question_)
 	df = Doucment_Frequency(question_term,Qg.All_relevant_Document)
+	print df
 	mark = []
 	for key,val in df.iteritems():
 		if val == 0:
 			mark.append(key)
-	print df
 	TFIDF = {}
 	for each_sentence in Ans_set:
 		each_sentence = each_sentence.replace(',','')
@@ -119,16 +122,19 @@ def TF_IDF(Ans_set,question_):
 				sentence.append(word)
 		
 		tf = Term_frequency(question_term,sentence)
+		mean = Average_len(Ans_set)
 		Num = len(sentence)
 		score = 0
 		for eachterm,termval in tf.iteritems():
 			if termval != 0:
 				TF = 0.5 + 0.5 * termval/Num
 				IDF = m.log(Fraction(total_Num,df[eachterm]))
+				# score = score + TF * IDF
 				score = score + TF * IDF
 			else :
 				TF = 0.5 + 0.5 * termval/Num
 				IDF = m.log(Fraction(total_Num,df[eachterm]))
+				# score = score - TF * IDF
 				score = score - TF * IDF
 		TFIDF[each_sentence] = score
 	return sorted(TFIDF.iteritems(), key=operator.itemgetter(1),reverse = True)
@@ -191,13 +197,30 @@ def Document_subset(subset,Num):
 	for i in range(0,Num):
 		result.append(subset[i][0])
 	return result
+
+def Average_len(Allset):
+	Idx = 0
+	length = 0
+	pattern = r'[^A-Za-z0-9\s]+'
+	for sentence in Allset:
+		sentence = re.sub(pattern,'',sentence)
+		result = []
+		for word in sentence:
+			if word not in stop:
+				result.append(word)
+		length = length + len(result)
+		Idx = Idx + 1
+	return Fraction(length,Idx)
+
+
 Query_term = dict.fromkeys(Qg.queryterms.keys(),0)
 Ans_type = Rule_Based_AnswerSystem(Qg.question)
 
 ansset = filterAnsByLabel(Document_set,Ans_type)
+# ansset = Document_set
 # print Answer_Score_System(ansset,Qg.question)
 ans = TF_IDF(ansset,Qg.question)
-ans_sub = Document_subset(ans,10)
-print ans_sub
+ans_sub = Document_subset(ans,20)
 
+print ans_sub
 

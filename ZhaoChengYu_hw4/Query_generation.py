@@ -4,36 +4,38 @@ from nltk.corpus import stopwords
 import math as m
 import operator
 from fractions import Fraction
-
+from nltk.stem.porter import PorterStemmer
 #Question term generator
 def Question_term(question):
 	stop = set(stopwords.words('english'))
-	question = question.replace('?','')
+	pattern = r'[^A-Za-z0-9\s]+'
+	question = re.sub(pattern,'', question)
 	token = nltk.word_tokenize(question)
 	cach = []
 	for word in token:
 		if word not in stop:
 			cach.append(word)
 	pos_tags = nltk.pos_tag(cach)
-	print pos_tags
 	query_term = {}
 	for item in pos_tags:
 		if item[0] != 'Which' and item[0] != 'What' and item[0] != 'Where' and item[0] != 'When' and item[0] != 'Who' and item[0] != 'Whose' and item[0] != 'How' and not query_term.has_key(item[0]):
 			query_term[item[0]] = 1
 		elif item[0] != 'Which' and item[0] != 'What' and item[0] != 'Where' and item[0] != 'When' and item[0] != 'Who' and item[0] != 'Whose' and item[0] != 'How' and query_term.has_key(item[0]):
 			query_term[item[0]] = query_term[item[0]] + 1
-			# if item[1] == 'NNP' or item[1] == 'NN' or item[1] == 'VBD' or item[1] == 'NNS' or item[1] == 'JJ' or item[1] == 'CD' or item[1] == 'IN'and not query_term.has_key(item[0]) :
-			# 	query_term[item[0]] = 1
-			# elif item[1] == 'NNP' or item[1] == 'NN' or item[1] == 'VBD' or item[1] == 'NNS' or item[1] == 'JJ' or item[1] == 'CD' or item[1] == 'IN' and query_term.has_key(item[0]) :
-			# 	query_term[item[0]] = query_term[item[0]] + 1
-	query_term_ = {}
-	# add plurals of the name 
-	for key in query_term:
-		keys = key + 's'
-		keyS = key + '\'s'
-		query_term_[keys] = 1
-		query_term_[keyS] = 1
-		query_term_[key] = 1
+		if item[1] == 'VBZ':
+			stemmer = PorterStemmer()
+			prototype = stemmer.stem(item[0]).encode('utf-8')
+			query_term[prototype] = 1
+			# print stemmer.stem('Facebook\'s')
+
+	# add plurals of the name
+
+	# for key in query_term:
+	# 	keys = key + 's'
+	# 	keyS = key + '\'s'
+	# 	query_term_[keys] = 1
+	# 	query_term_[keyS] = 1
+	# 	query_term_[key] = 1
 	return query_term
 
 #find the document which contains at least one of the keywords
@@ -158,12 +160,13 @@ def All_Document(key_words):
 					All_relevant_Document.append(document)
 	return All_relevant_Document
 
-question = 'What affects GDP?'
+
+
+question = 'What affects GDP ?'
 queryterms = Question_term(question)
-print queryterms
 All_relevant_Document = All_Document(queryterms)
 ans = TF_IDF(queryterms,All_relevant_Document,len(All_relevant_Document))
-
+print ans
 
 
 
