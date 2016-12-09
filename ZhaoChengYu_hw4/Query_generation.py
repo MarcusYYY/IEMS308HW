@@ -22,10 +22,10 @@ def Question_term(question):
 			query_term[item[0]] = 1
 		elif item[0] != 'Which' and item[0] != 'What' and item[0] != 'Where' and item[0] != 'When' and item[0] != 'Who' and item[0] != 'Whose' and item[0] != 'How' and query_term.has_key(item[0]):
 			query_term[item[0]] = query_term[item[0]] + 1
-		if item[1] == 'VBZ':
-			stemmer = PorterStemmer()
-			prototype = stemmer.stem(item[0]).encode('utf-8')
-			query_term[prototype] = 1
+		# if item[1] == 'VBZ':
+		# 	stemmer = PorterStemmer()
+		# 	prototype = stemmer.stem(item[0]).encode('utf-8')
+		# 	query_term[prototype] = 1
 			# print stemmer.stem('Facebook\'s')
 
 	# add plurals of the name
@@ -73,6 +73,7 @@ def TF_IDF(keywords,All_relevant_Document,totalNum):
 		for eachterm,value in term.iteritems():
 			TF = 0.5 + (0.5 * value/max_term)
 			IDF = m.log(Fraction(totalNum,df[eachterm]))
+
 			# IDF = m.log(float(totalNum/df[eachterm]))
 			tf_idf = TF * IDF
 			score = score + tf_idf
@@ -162,11 +163,12 @@ def All_Document(key_words):
 
 
 
-question = 'What affects GDP ?'
+question = 'What is the unemployment rate?'
 queryterms = Question_term(question)
+print queryterms
 All_relevant_Document = All_Document(queryterms)
 ans = TF_IDF(queryterms,All_relevant_Document,len(All_relevant_Document))
-print ans
+
 
 
 

@@ -105,17 +105,20 @@ def TF_IDF(Ans_set,question_):
 	total_Num = len(Qg.All_relevant_Document)
 	question_term = Qg.Question_term(question_)
 	df = Doucment_Frequency(question_term,Qg.All_relevant_Document)
-	print df
 	mark = []
 	for key,val in df.iteritems():
 		if val == 0:
 			mark.append(key)
 	TFIDF = {}
+	print df
 	for each_sentence in Ans_set:
 		each_sentence = each_sentence.replace(',','')
 		each_sentence = each_sentence.replace('|','')
 
-		sentence_ = nltk.word_tokenize(each_sentence)
+		try:
+			sentence_ = nltk.word_tokenize(each_sentence)
+		except:
+			continue
 		sentence = []
 		for word in sentence_:
 			if word not in stop:
@@ -220,7 +223,6 @@ ansset = filterAnsByLabel(Document_set,Ans_type)
 # ansset = Document_set
 # print Answer_Score_System(ansset,Qg.question)
 ans = TF_IDF(ansset,Qg.question)
-ans_sub = Document_subset(ans,20)
-
+ans_sub = Document_subset(ans,10)
 print ans_sub
 

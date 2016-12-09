@@ -117,9 +117,9 @@ y = final_train[:,4]
 clf.fit(X,y)
 result = clf.predict(X)
 
-# print 'accruacy'
+# print 'Accruacy:'
 # print metrics.accuracy_score(y,result)
-# print 'report'
+# print 'Confustion Table:'
 # print metrics.classification_report(result,y)
 # test_questions()
 # clf_ = MLPClassifier(solver='lbfgs', alpha=1e-5,hidden_layer_sizes=(10,10), random_state=1)
